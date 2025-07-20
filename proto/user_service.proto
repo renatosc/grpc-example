@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcExample.UserService";
+option java_package = "com.grpcexample.userservice";
+option java_outer_classname = "UserServiceProto";
+
+package userservice;
+
+// User Service Definition
+service UserService {
+  // Unary call - Get user by ID
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  
+  // Unary call - Create new user
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  
+  // Server streaming - Get users by department
+  rpc GetUsersByDepartment(GetUsersByDepartmentRequest) returns (stream User);
+  
+  // Client streaming - Bulk create users
+  rpc BulkCreateUsers(stream CreateUserRequest) returns (BulkCreateUsersResponse);
+  
+  // Bidirectional streaming - Real-time user updates
+  rpc UserUpdatesStream(stream UserUpdateRequest) returns (stream UserUpdateResponse);
+  
+  // Health check and server info for load balancing demo
+  rpc GetServerInfo(ServerInfoRequest) returns (ServerInfoResponse);
+}
+
+// Messages
+message User {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  string department = 4;
+  int64 created_timestamp = 5;
+}
+
+message GetUserRequest {
+  int32 user_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+  string server_id = 2; // To demonstrate load balancing
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  string department = 3;
+}
+
+message CreateUserResponse {
+  User user = 1;
+  string server_id = 2;
+  bool success = 3;
+  string message = 4;
+}
+
+message GetUsersByDepartmentRequest {
+  string department = 1;
+  int32 limit = 2;
+}
+
+message BulkCreateUsersResponse {
+  int32 created_count = 1;
+  repeated int32 user_ids = 2;
+  string server_id = 3;
+  repeated string errors = 4;
+}
+
+message UserUpdateRequest {
+  int32 user_id = 1;
+  oneof update_type {
+    string new_name = 2;
+    string new_email = 3;
+    string new_department = 4;
+  }
+}
+
+message UserUpdateResponse {
+  User updated_user = 1;
+  string server_id = 2;
+  bool success = 3;
+  string message = 4;
+}
+
+message ServerInfoRequest {
+  // Empty request
+}
+
+message ServerInfoResponse {
+  string server_id = 1;
+  string server_type = 2; // "C#" or "Java"
+  string version = 3;
+  int64 uptime_seconds = 4;
+  int32 total_requests_handled = 5;
+  repeated string supported_features = 6;
+}
