@@ -48,8 +48,8 @@ The shared contract is defined in `proto/user_service.proto` and includes:
 ### Next Steps
 
 1. ✅ Step 1: Protocol Buffers Definition (COMPLETED)
-2. 🔄 Step 2: C# Server Implementation
-3. ⏳ Step 3: C# Client Implementation
+2. ✅ Step 2: C# Server Implementation
+3. 🔄 Step 3: C# Client Implementation
 4. ⏳ Step 4: Java Server Implementation
 5. ⏳ Step 5: Java Client Implementation
 6. ⏳ Step 6: Docker Compose & Load Balancing Demo
