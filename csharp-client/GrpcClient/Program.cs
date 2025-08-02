@@ -7,17 +7,22 @@ namespace GrpcClient;
 
 class Program
 {
-    private static readonly List<string> ServerAddresses = new()
-    {
-        "https://localhost:7001", // Server 1
-        "https://localhost:7002", // Server 2  
-        "https://localhost:7003"  // Server 3
-    };
+    private static List<string> ServerAddresses = new();
 
     static async Task Main(string[] args)
     {
         Console.WriteLine("🚀 gRPC Load Balancing Client Demo");
         Console.WriteLine("=====================================");
+
+        // Parse command line arguments for server addresses
+        if (!ParseServerAddresses(args))
+        {
+            PrintUsageAndExit();
+            return;
+        }
+
+        Console.WriteLine($"📡 Configured servers: {string.Join(", ", ServerAddresses)}");
+        Console.WriteLine();
 
         try
         {
@@ -35,6 +40,64 @@ class Program
 
         Console.WriteLine("\n✅ Demo completed. Press any key to exit...");
         Console.ReadKey();
+    }    static bool ParseServerAddresses(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            // Use default servers when no arguments provided
+            Console.WriteLine("🔧 No server addresses provided, using default servers: 7001, 7002, 7003");
+            ServerAddresses.AddRange(new[] { "https://localhost:7001", "https://localhost:7002", "https://localhost:7003" });
+            return true;
+        }
+
+        foreach (var arg in args)
+        {
+            // Support different input formats
+            string serverAddress;
+            
+            if (arg.StartsWith("http://") || arg.StartsWith("https://"))
+            {
+                // Full URL provided
+                serverAddress = arg;
+            }
+            else if (arg.Contains(":"))
+            {
+                // Host:port format, assume HTTP
+                serverAddress = $"http://{arg}";
+            }
+            else if (int.TryParse(arg, out int port))
+            {
+                // Just port number, assume localhost
+                serverAddress = $"https://localhost:{port}";
+            }
+            else
+            {
+                Console.WriteLine($"❌ Invalid server address format: {arg}");
+                return false;
+            }
+
+            ServerAddresses.Add(serverAddress);
+        }
+
+        return ServerAddresses.Count > 0;
+    }
+
+    static void PrintUsageAndExit()
+    {
+        Console.WriteLine("Usage: GrpcClient <server1> <server2> ... <serverN>");
+        Console.WriteLine();
+        Console.WriteLine("Server address formats supported:");
+        Console.WriteLine("  7001                    → https://localhost:7001");
+        Console.WriteLine("  localhost:7001          → http://localhost:7001");
+        Console.WriteLine("  http://localhost:7001   → http://localhost:7001");
+        Console.WriteLine("  https://localhost:7001  → https://localhost:7001");
+        Console.WriteLine();
+        Console.WriteLine("Examples:");
+        Console.WriteLine("  GrpcClient 7001 7002 7003");
+        Console.WriteLine("  GrpcClient localhost:7001 localhost:7002");
+        Console.WriteLine("  GrpcClient https://localhost:7001 http://localhost:7011");
+        Console.WriteLine();
+        Console.WriteLine("Default servers (if no arguments): 7001, 7002, 7003");
     }
 
     static async Task DemonstrateLoadBalancing()
