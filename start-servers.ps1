@@ -97,18 +97,16 @@ foreach ($port in $Ports) {
             java -jar $javaServerJar $port
         } -ArgumentList $javaServerJar, $port, $javaServerPath -Name "JavaServer-$port"
         
-        Write-Host "SUCCESS: Java server started on port $port (Job ID: $($job.Id))" -ForegroundColor Green
-    } else {
+        Write-Host "SUCCESS: Java server started on port $port (Job ID: $($job.Id))" -ForegroundColor Green    } else {
         # Start C# server
-        $serverUrl = "https://localhost:$port"
-        Write-Host "Starting C# server on $serverUrl..." -ForegroundColor Yellow
+        Write-Host "Starting C# server on port $port (HTTP/2 plaintext for cross-language compatibility)..." -ForegroundColor Yellow
         
         $job = Start-Job -ScriptBlock {
-            param($csharpServerExe, $serverUrl, $csharpServerPath)
+            param($csharpServerExe, $port, $csharpServerPath)
             Set-Location $csharpServerPath
-            $env:ASPNETCORE_URLS = $serverUrl
-            & $csharpServerExe
-        } -ArgumentList $csharpServerExe, $serverUrl, $csharpServerPath -Name "GrpcServer-$port"
+            $env:GRPC_PORT = $port
+            & $csharpServerExe $port
+        } -ArgumentList $csharpServerExe, $port, $csharpServerPath -Name "GrpcServer-$port"
         
         Write-Host "SUCCESS: C# server started on port $port (Job ID: $($job.Id))" -ForegroundColor Green
     }
