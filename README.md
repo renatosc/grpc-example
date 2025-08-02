@@ -1,4 +1,4 @@
-# gRPC Load Balancing Example
+# gRPC Example
 
 This project demonstrates gRPC communication and load balancing capabilities with both C# and Java implementations.
 
@@ -44,6 +44,49 @@ The shared contract is defined in `proto/user_service.proto` and includes:
 - .NET 8.0 SDK
 - Java 17+ and Maven
 - Protocol Buffers Compiler (protoc)
+
+### Running the Load Balancing Demo
+
+**Option 1: Using PowerShell Scripts (Recommended)**
+
+1. **Start multiple server instances**:
+   ```powershell
+   .\start-servers.ps1
+   ```
+   This starts 3 C# servers on ports 7001, 7002, and 7003.
+
+2. **Test server connectivity** (optional):
+   ```powershell
+   .\test-servers.ps1
+   ```
+
+3. **Run the client demo**:
+   ```powershell
+   cd csharp-client\GrpcClient
+   dotnet run
+   ```
+
+4. **Stop all servers**:
+   ```powershell
+   .\stop-servers.ps1
+   ```
+
+**Option 2: Manual Server Start**
+
+Start each server in a separate terminal:
+```powershell
+# Terminal 1 - Server on port 7001
+cd csharp-server\GrpcServer
+dotnet run --urls=https://localhost:7001
+
+# Terminal 2 - Server on port 7002  
+cd csharp-server\GrpcServer
+dotnet run --urls=https://localhost:7002
+
+# Terminal 3 - Server on port 7003
+cd csharp-server\GrpcServer
+dotnet run --urls=https://localhost:7003
+```
 
 ### Next Steps
 
